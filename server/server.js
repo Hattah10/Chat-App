@@ -1,11 +1,10 @@
-
-
 import express from "express";
 import http from "http";
 import cors from "cors";
 import { Server } from "socket.io";
 import registerChatSocket from "./sockets/chat.socket.js";
 import { connectDB } from "./config/db.js";
+import charactersRoutes from "./routes/charactersRoutes.js";
 
 export function createServer() {
   const app = express();
@@ -23,12 +22,9 @@ export function createServer() {
   });
 
   registerChatSocket(io);
-
-  app.get("/", (req, res) => {
-    res.send("Chat server running");
-  });
-
   connectDB();
+
+  app.use("/api/characters", charactersRoutes);
 
   return server;
 }

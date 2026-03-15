@@ -3,3 +3,4 @@ export interface Character {
   name: string
   avatar: string
 }
+

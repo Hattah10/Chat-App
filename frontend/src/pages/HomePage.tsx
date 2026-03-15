@@ -2,17 +2,11 @@ import { useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { useNavigate } from "react-router-dom"
+import { useCharacters } from "@/hooks/useCharacter"
 
-const characters = [
-  { id: "dev", name: "Developer", avatar: "👨‍💻" },
-  { id: "hacker", name: "Hacker", avatar: "🕶️" },
-  { id: "wizard", name: "Wizard", avatar: "🧙" },
-  { id: "robot", name: "Robot", avatar: "🤖" },
-  { id: "cat", name: "Cat", avatar: "🐱" },
-  { id: "alien", name: "Alien", avatar: "👽" },
-]
 
 export default function HomePage() {
+  const { characters, loading, error } = useCharacters()
   const [selected, setSelected] = useState<string | null>(null)
   const navigate = useNavigate()
 
@@ -21,6 +15,9 @@ export default function HomePage() {
     // Pass selected character as state
     navigate("/chat", { state: { character: selected } })
   }
+
+  if (loading) return <div>Loading...</div>
+  if (error) return <div>Error: {error}</div>
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8">
       <div className="text-center">
