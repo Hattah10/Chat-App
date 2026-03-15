@@ -1,0 +1,34 @@
+
+
+import express from "express";
+import http from "http";
+import cors from "cors";
+import { Server } from "socket.io";
+import registerChatSocket from "./sockets/chat.socket.js";
+import { connectDB } from "./config/db.js";
+
+export function createServer() {
+  const app = express();
+
+  app.use(cors());
+  app.use(express.json());
+
+  const server = http.createServer(app);
+
+  const io = new Server(server, {
+    cors: {
+      origin: "http://localhost:5173",
+      methods: ["GET", "POST"],
+    },
+  });
+
+  registerChatSocket(io);
+
+  app.get("/", (req, res) => {
+    res.send("Chat server running");
+  });
+
+  connectDB();
+
+  return server;
+}
