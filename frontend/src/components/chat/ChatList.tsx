@@ -7,7 +7,7 @@ interface ChatContactProps {
   other_character_name: string
   type: string
   avatarSrc: string
-  lastMessage: string
+  lastMessage?: string
   timestamp?: string
   hasUnread: boolean
   isActive: boolean

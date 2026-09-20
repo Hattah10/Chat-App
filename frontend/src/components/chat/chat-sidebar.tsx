@@ -66,6 +66,9 @@ export function ChatSidebar({
     setSelectedUsers([])
   }
 
+  const filteredChatRoom = chatRoom.filter((room) => {
+    return room.type.includes(activeTab)
+  })
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (!characterId || selectedUsers.length === 0) return
@@ -128,11 +131,11 @@ export function ChatSidebar({
           variant="ghost"
           className={cn(
             "h-9 flex-1 rounded-md text-sm font-medium",
-            activeTab === "groups"
+            activeTab === "group"
               ? "shadow-sm"
               : "text-muted-foreground hover:bg-transparent"
           )}
-          onClick={() => setActiveTab("groups")}
+          onClick={() => setActiveTab("group")}
         >
           <Users className="mr-2 h-4 w-4" />
           Groups
@@ -140,7 +143,7 @@ export function ChatSidebar({
       </div>
 
       <div className="flex-1 space-y-2 overflow-y-auto pr-2">
-        {chatRoom?.map((contact) => (
+        {filteredChatRoom?.map((contact) => (
           <ChatList
             key={contact.room_id}
             // {...contact}
@@ -149,7 +152,7 @@ export function ChatSidebar({
             other_character_name={contact.other_character_name}
             type={contact.type}
             avatarSrc="🙂"
-            lastMessage="No messages yet"
+            // lastMessage="No messages yet"
             hasUnread={false}
             isActive={contact.room_id === activeChatId}
             onClick={setActiveChatId}
