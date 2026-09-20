@@ -37,7 +37,7 @@ export function ChatList({
       <Avatar>
         <AvatarImage src={avatarSrc} alt={name} />
         <AvatarFallback>
-          {type.trim() === "private"
+          {type.trim() === "private" || type.trim() === "personal"
             ? other_character_name
             : (name?.charAt(0) ?? "?")}{" "}
         </AvatarFallback>
@@ -45,7 +45,9 @@ export function ChatList({
       <div className="flex-1">
         <div className="flex items-center justify-between">
           <span className="font-medium">
-            {type.trim() === "private" ? other_character_name : name}
+            {type.trim() === "private" || type.trim() === "personal"
+              ? other_character_name
+              : name}
           </span>
           <span className="text-xs text-muted-foreground">{timestamp}</span>
         </div>

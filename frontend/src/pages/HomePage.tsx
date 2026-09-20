@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button"
 import { useNavigate } from "react-router-dom"
 import { useCharacters } from "@/hooks/useCharacter"
 
-
 export default function HomePage() {
   const { characters, loading, error } = useCharacters()
   const [selected, setSelected] = useState<string | null>(null)

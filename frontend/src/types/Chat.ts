@@ -11,6 +11,18 @@ export interface SendMessagePayload {
   character_id: string
   room_id: string
 }
+export interface CreateRoomPayload {
+  character_id: string
+  participant_ids: string[]
+  name?: string | null
+}
+
+export interface CreateRoomResponse {
+  room_id: string
+  type: string
+  name: string | null
+}
+
 export interface ChatListType {
   room_id: string
   name: string

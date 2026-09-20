@@ -32,7 +32,7 @@ export function ChatMain({ character_id, activeChatId }: Props) {
           </Avatar>
           <div>
             <h2 className="font-semibold">{roomInfo.name}</h2>
-            <p className="text-sm text-muted-foreground">{roomInfo.status}</p>
+            {/* <p className="text-sm text-muted-foreground">{roomInfo.status}</p> */}
           </div>
         </div>
         <MoreVertical className="h-5 w-5 cursor-pointer text-muted-foreground" />

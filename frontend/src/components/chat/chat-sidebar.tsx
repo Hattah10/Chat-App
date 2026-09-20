@@ -1,7 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Search, User, Users, X } from "lucide-react"
+import { Search, User, Users } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { ChatListType } from "@/types/Chat"
 import { ChatList } from "./ChatList"
@@ -16,13 +16,13 @@ import {
 } from "../ui/dialog"
 import { useState } from "react"
 
-import { Badge } from "../ui/badge"
-
 import MultiSelect from "../ui/multi-select"
 import { useCharacters } from "@/hooks/useCharacter"
+import { useCreateRoom } from "@/hooks/useCreateRoom"
 
 type Props = {
-  chatContact: ChatListType[]
+  characterId: string
+  chatRoom: ChatListType[]
   activeTab: string
   setActiveTab: React.Dispatch<React.SetStateAction<string>>
   activeChatId: string
@@ -30,7 +30,8 @@ type Props = {
 }
 
 export function ChatSidebar({
-  chatContact,
+  characterId,
+  chatRoom,
   activeTab,
   setActiveTab,
   activeChatId,
@@ -56,18 +57,52 @@ export function ChatSidebar({
   // ];
 
   const { characters } = useCharacters()
+  const { createRoom, loading, error } = useCreateRoom(characterId)
 
-  const [selectedUsers, setSelectedUsers] = useState<any[]>([])
+  const [open, setOpen] = useState(false)
+  const [selectedUsers, setSelectedUsers] = useState<(string | number)[]>([])
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    console.log("Selected users:", selectedUsers)
+  const resetForm = () => {
+    setSelectedUsers([])
   }
 
-  const userOptions = characters.map((user) => ({
-    value: user.id,
-    label: user.name,
-  }))
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    if (!characterId || selectedUsers.length === 0) return
+
+    try {
+      const room = await createRoom({
+        character_id: characterId,
+        participant_ids: selectedUsers.map(String),
+      })
+
+      setActiveChatId(room.room_id)
+      resetForm()
+      setOpen(false)
+    } catch {
+      // Error text is shown from useCreateRoom
+    }
+  }
+
+  const currentCharacterName = characters.find(
+    (user) => user.id === characterId
+  )?.name
+
+  const displayGroupName = (name: string) => {
+    if (!name || !currentCharacterName) return name
+    return name
+      .split(",")
+      .map((part) => part.trim())
+      .filter((part) => part !== currentCharacterName)
+      .join(", ")
+  }
+
+  const userOptions = characters
+    .filter((user) => user.id !== characterId)
+    .map((user) => ({
+      value: user.id,
+      label: user.name,
+    }))
 
   return (
     <div className="flex w-full flex-col border border-r p-4 lg:w-80">
@@ -105,12 +140,12 @@ export function ChatSidebar({
       </div>
 
       <div className="flex-1 space-y-2 overflow-y-auto pr-2">
-        {chatContact?.map((contact) => (
+        {chatRoom?.map((contact) => (
           <ChatList
             key={contact.room_id}
             // {...contact}
             room_id={contact.room_id}
-            name={contact.name}
+            name={displayGroupName(contact.name)}
             other_character_name={contact.other_character_name}
             type={contact.type}
             avatarSrc="🙂"
@@ -123,11 +158,14 @@ export function ChatSidebar({
       </div>
 
       <div className="mt-6">
-        <Dialog>
-          {/* <form>
-
-          </form> */}
-          <DialogTrigger>
+        <Dialog
+          open={open}
+          onOpenChange={(nextOpen) => {
+            setOpen(nextOpen)
+            if (!nextOpen) resetForm()
+          }}
+        >
+          <DialogTrigger asChild>
             <Button className="w-full">New chat</Button>
           </DialogTrigger>
 
@@ -136,19 +174,28 @@ export function ChatSidebar({
               <DialogHeader>
                 <DialogTitle>Create A New Chat</DialogTitle>
               </DialogHeader>
-              {/* Multi-select input */}
-              <div className="w-full max-w-md py-3.5">
+              <div className="w-full max-w-md space-y-3 py-3.5">
                 <MultiSelect
+                  key={open ? "new-chat-open" : "new-chat-closed"}
                   options={userOptions}
                   setSelect={setSelectedUsers}
                   placeholder={"Select User"}
                 />
+
+                {error && <p className="text-sm text-destructive">{error}</p>}
               </div>
               <DialogFooter>
-                <DialogClose>
-                  <Button variant="outline">Cancel</Button>
+                <DialogClose asChild>
+                  <Button type="button" variant="outline">
+                    Cancel
+                  </Button>
                 </DialogClose>
-                <Button type="submit">Create Chat</Button>
+                <Button
+                  type="submit"
+                  disabled={loading || selectedUsers.length === 0}
+                >
+                  {loading ? "Creating..." : "Create Chat"}
+                </Button>
               </DialogFooter>
             </form>
           </DialogContent>

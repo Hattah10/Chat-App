@@ -30,19 +30,22 @@ export const getChatList = async (req, res) => {
     r.id AS room_id,
     r.type,
     r.name,
-    c.id AS other_character_id,
-    c.name AS other_character_name,
-    c.avatar
+    (ARRAY_AGG(c.id))[1] AS other_character_id,
+    STRING_AGG(c.name, ', ') AS other_character_name,
+    (ARRAY_AGG(c.avatar))[1] AS avatar
 FROM room_participants rp
 JOIN rooms r ON rp.room_id = r.id
 LEFT JOIN room_participants rp2 
     ON rp2.room_id = r.id AND rp2.character_id != $1
 LEFT JOIN characters c 
     ON c.id = rp2.character_id
-WHERE rp.character_id = $1`,
+WHERE rp.character_id = $1
+GROUP BY r.id, r.type, r.name`,
       [characterId],
     );
     res.json(result.rows);
+    console.log("get room list", result.rows);
+
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Failed to fetch rooms" });

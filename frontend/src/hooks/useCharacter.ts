@@ -1,27 +1,20 @@
-// src/hooks/useUser.ts
-import { useState, useEffect } from "react";
-import { getCharacters } from '../api/charactersApi';
+import { useQuery } from '@tanstack/react-query';
+import { getCharacters } from "../api/charactersApi";
+import type { Character } from "@/types/Index";
 
 export const useCharacters = () => {
-  const [characters, setCharacters] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    data: characters = [],
+    isLoading: loading,
+    error,
+     } = useQuery<Character[], Error>({
+    queryKey: ["characters"],
+    queryFn: getCharacters,
+  });
 
-  useEffect(() => {
-    const fetchCharacters = async () => {
-      try {
-        setLoading(true);
-        const data = await getCharacters();
-        setCharacters(data);
-      } catch (err: any) {
-        setError(err.message || "Something went wrong");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCharacters();
-  }, []);
-
-  return { characters, loading, error };
+  return {
+    characters,
+    loading,
+    error: error?.message ?? null,
+  };
 };

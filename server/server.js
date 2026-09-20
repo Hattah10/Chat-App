@@ -5,6 +5,7 @@ import { Server } from "socket.io";
 import registerChatSocket from "./sockets/chat.socket.js";
 import { connectDB } from "./config/db.js";
 import charactersRoutes from "./routes/charactersRoutes.js";
+import roomRoutes from "./routes/roomRoutes.js";
 
 export function createServer() {
   const app = express();
@@ -25,6 +26,7 @@ export function createServer() {
   connectDB();
 
   app.use("/api/characters", charactersRoutes);
+  app.use("/api/rooms", roomRoutes);
 
   return server;
 }

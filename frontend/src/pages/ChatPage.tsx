@@ -19,17 +19,15 @@ function ChatPage() {
 
   const [activeTab, setActiveTab] = useState("personal")
   const [activeChatId, setActiveChatId] = useState("") // Default active chat
-  const { chatList } = useChatList(character)
+  const { data: chatRoomList = [] } = useChatList(character)
 
   // Auto-select the first chat for desktop
   useEffect(() => {
     const handleResize = () => {
       const isDesktop = window.innerWidth >= 1024
 
-      if (isDesktop && chatList?.length > 0) {
-        setActiveChatId(chatList[0].room_id)
-      } else {
-        setActiveChatId("") // reset for mobile/tablet
+      if (isDesktop && chatRoomList?.length > 0 && !activeChatId) {
+        setActiveChatId(chatRoomList[0].room_id)
       }
     }
     // run on mount
@@ -37,12 +35,13 @@ function ChatPage() {
     // listen for window resize
     window.addEventListener("resize", handleResize)
     return () => window.removeEventListener("resize", handleResize)
-  }, [chatList])
+  }, [chatRoomList, activeChatId])
 
   return (
     <div className="flex h-screen">
       <ChatSidebar
-        chatContact={chatList}
+        characterId={character ?? ""}
+        chatRoom={chatRoomList}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         activeChatId={activeChatId}
