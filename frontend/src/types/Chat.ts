@@ -4,6 +4,8 @@ export interface MessageType {
   created_at: string
   content: string
   room_id: string
+  name?: string | null
+  avatar?: string | null
 }
 
 export interface SendMessagePayload {
@@ -34,4 +36,11 @@ export interface ChatListType {
   hasUnread: boolean
   isActive: boolean
   onClick: (id: string) => void
+}
+
+export interface RoomInfo {
+  name: string
+  avatarSrc?: string
+  status?: string
+  other_character_name?:string
 }

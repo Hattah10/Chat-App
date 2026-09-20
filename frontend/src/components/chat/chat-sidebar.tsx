@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { Search, User, Users } from "lucide-react"
 import { cn } from "@/lib/utils"
-import type { ChatListType } from "@/types/Chat"
+import type { ChatListType, RoomInfo } from "@/types/Chat"
 import { ChatList } from "./ChatList"
 import {
   Dialog,
@@ -27,6 +27,7 @@ type Props = {
   setActiveTab: React.Dispatch<React.SetStateAction<string>>
   activeChatId: string
   setActiveChatId: React.Dispatch<React.SetStateAction<string>>
+  setRoomInfo: React.Dispatch<React.SetStateAction<RoomInfo | null>>
 }
 
 export function ChatSidebar({
@@ -36,6 +37,7 @@ export function ChatSidebar({
   setActiveTab,
   activeChatId,
   setActiveChatId,
+  setRoomInfo,
 }: Props) {
   // const chatContacts = [
   // {
@@ -66,9 +68,6 @@ export function ChatSidebar({
     setSelectedUsers([])
   }
 
-  const filteredChatRoom = chatRoom.filter((room) => {
-    return room.type.includes(activeTab)
-  })
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (!characterId || selectedUsers.length === 0) return
@@ -107,6 +106,11 @@ export function ChatSidebar({
       label: user.name,
     }))
 
+  const handleChatSelect = (room: ChatListType) => {
+    setActiveChatId(room.room_id)
+    setRoomInfo(room)
+  }
+
   return (
     <div className="flex w-full flex-col border border-r p-4 lg:w-80">
       <div className="mb-6 flex items-center justify-between">
@@ -143,11 +147,10 @@ export function ChatSidebar({
       </div>
 
       <div className="flex-1 space-y-2 overflow-y-auto pr-2">
-        {filteredChatRoom?.map((contact) => (
+        {chatRoom?.map((contact) => (
           <ChatList
             key={contact.room_id}
             // {...contact}
-            room_id={contact.room_id}
             name={displayGroupName(contact.name)}
             other_character_name={contact.other_character_name}
             type={contact.type}
@@ -155,9 +158,15 @@ export function ChatSidebar({
             // lastMessage="No messages yet"
             hasUnread={false}
             isActive={contact.room_id === activeChatId}
-            onClick={setActiveChatId}
+            onClick={() => handleChatSelect(contact)}
           />
         ))}
+
+        {chatRoom.length === 0 && (
+          <p className="py-8 text-center text-sm text-muted-foreground">
+            No conversations yet. Start a new chat!
+          </p>
+        )}
       </div>
 
       <div className="mt-6">

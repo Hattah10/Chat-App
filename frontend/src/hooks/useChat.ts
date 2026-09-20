@@ -17,12 +17,10 @@ export const useChat = (room_id:string) => {
 
     // Handler for incoming messages
     const handleMessage = (msg: MessageType) => {
-      console.log(msg)
       setMessages(prev => [...prev, msg])
     }
 
     const handleLoadMessages = (msg: MessageType[]) => {
-      console.log(msg)
       setMessages(msg)
     }
     socket.on("load_messages", handleLoadMessages)

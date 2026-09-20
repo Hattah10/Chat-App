@@ -5,33 +5,29 @@ import { useEffect } from "react"
 import { ChatInput } from "./ChatInput"
 import MessageBubble from "./MessageBubble"
 import { useChat } from "@/hooks/useChat"
+import type { RoomInfo } from "@/types/Chat"
 
 type Props = {
   character_id: string
   activeChatId: string
+  roomInfo: RoomInfo | null
 }
-export function ChatMain({ character_id, activeChatId }: Props) {
+export function ChatMain({ character_id, activeChatId, roomInfo }: Props) {
   const { messages, sendMessage } = useChat(activeChatId)
-  const roomInfo = {
-    name: "Shannon Baker",
-    avatarSrc: "/placeholder.svg?height=40&width=40",
-    status: "last seen recently",
-  }
-
-  useEffect(() => {})
+  const roomName = roomInfo?.name || roomInfo?.other_character_name || "unknown"
   return (
     <div className="m-4 hidden rounded-lg shadow-sm lg:flex lg:flex-1 lg:flex-col">
       <div className="flex items-center justify-between border border-b p-4">
         <div className="flex items-center gap-3">
           <Avatar className="h-10 w-10">
             <AvatarImage
-              src={roomInfo.avatarSrc || "/placeholder.svg"}
-              alt={roomInfo.name}
+              src={roomInfo?.avatarSrc || "/placeholder.svg"}
+              alt={roomInfo?.name}
             />
-            <AvatarFallback>{roomInfo.name.charAt(0)}</AvatarFallback>
+            <AvatarFallback>{roomName?.charAt(0)}</AvatarFallback>
           </Avatar>
           <div>
-            <h2 className="font-semibold">{roomInfo.name}</h2>
+            <h2 className="font-semibold">{roomName}</h2>
             {/* <p className="text-sm text-muted-foreground">{roomInfo.status}</p> */}
           </div>
         </div>
@@ -43,8 +39,9 @@ export function ChatMain({ character_id, activeChatId }: Props) {
           <MessageBubble
             key={msg.id}
             message={msg.content}
-            isUserMessage={(msg.character_id === character_id) === true}
-            // avatarSrc={null}
+            isUserMessage={msg.character_id === character_id}
+            avatarSrc={msg.avatar}
+            name={msg.name}
           />
         ))}
       </div>

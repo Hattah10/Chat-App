@@ -2,7 +2,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { cn } from "@/lib/utils"
 
 interface ChatContactProps {
-  room_id: string
   name: string
   other_character_name: string
   type: string
@@ -11,11 +10,10 @@ interface ChatContactProps {
   timestamp?: string
   hasUnread: boolean
   isActive: boolean
-  onClick: (id: string) => void
+  onClick: () => void
 }
 
 export function ChatList({
-  room_id,
   name,
   other_character_name,
   type,
@@ -32,13 +30,13 @@ export function ChatList({
         "flex cursor-pointer items-center gap-3 rounded-lg p-3 transition-colors hover:bg-muted",
         isActive && "bg-muted"
       )}
-      onClick={() => onClick(room_id)}
+      onClick={onClick}
     >
       <Avatar>
         <AvatarImage src={avatarSrc} alt={name} />
         <AvatarFallback>
           {type.trim() === "private" || type.trim() === "personal"
-            ? other_character_name
+            ? other_character_name.charAt(0)
             : (name?.charAt(0) ?? "?")}{" "}
         </AvatarFallback>
       </Avatar>
