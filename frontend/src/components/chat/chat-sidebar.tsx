@@ -1,10 +1,25 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Search, User, Users } from "lucide-react"
+import { Search, User, Users, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { ChatListType } from "@/types/Chat"
 import { ChatList } from "./ChatList"
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../ui/dialog"
+import { useState } from "react"
+
+import { Badge } from "../ui/badge"
+
+import MultiSelect from "../ui/multi-select"
+import { useCharacters } from "@/hooks/useCharacter"
 
 type Props = {
   chatContact: ChatListType[]
@@ -13,6 +28,7 @@ type Props = {
   activeChatId: string
   setActiveChatId: React.Dispatch<React.SetStateAction<string>>
 }
+
 export function ChatSidebar({
   chatContact,
   activeTab,
@@ -38,6 +54,20 @@ export function ChatSidebar({
   //   hasUnread: true
   // },
   // ];
+
+  const { characters } = useCharacters()
+
+  const [selectedUsers, setSelectedUsers] = useState<any[]>([])
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    console.log("Selected users:", selectedUsers)
+  }
+
+  const userOptions = characters.map((user) => ({
+    value: user.id,
+    label: user.name,
+  }))
 
   return (
     <div className="flex w-full flex-col border border-r p-4 lg:w-80">
@@ -93,7 +123,36 @@ export function ChatSidebar({
       </div>
 
       <div className="mt-6">
-        <Button className="w-full">New chat</Button>
+        <Dialog>
+          {/* <form>
+
+          </form> */}
+          <DialogTrigger>
+            <Button className="w-full">New chat</Button>
+          </DialogTrigger>
+
+          <DialogContent>
+            <form onSubmit={handleSubmit}>
+              <DialogHeader>
+                <DialogTitle>Create A New Chat</DialogTitle>
+              </DialogHeader>
+              {/* Multi-select input */}
+              <div className="w-full max-w-md py-3.5">
+                <MultiSelect
+                  options={userOptions}
+                  setSelect={setSelectedUsers}
+                  placeholder={"Select User"}
+                />
+              </div>
+              <DialogFooter>
+                <DialogClose>
+                  <Button variant="outline">Cancel</Button>
+                </DialogClose>
+                <Button type="submit">Create Chat</Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   )

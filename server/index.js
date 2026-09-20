@@ -2,7 +2,7 @@ import "dotenv/config";
 
 import { createServer } from "./server.js";
 
-const PORT = 3000;
+const PORT = 3010;
 
 const server = createServer();
 
